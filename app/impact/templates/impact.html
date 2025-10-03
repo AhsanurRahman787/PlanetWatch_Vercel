@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AstroWave v1 – Enhanced Impact Simulator</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --accent: #f72585;
+            --accent2: #4895ef;
+            --text: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        html, body, .container-fluid, .row, #map { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+        }
+
+        /* Enhanced Navbar */
+        .navbar-small { 
+            padding: .5rem 1rem; 
+            font-size: .85rem; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            gap: .5rem; 
+            background: rgba(0,0,0,0.7) !important;
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-small input, .navbar-small .form-range, .navbar-small button { 
+            height: 2.5rem; 
+            font-size: .85rem; 
+            padding: .3rem .5rem; 
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .navbar-small input:focus, .navbar-small .form-range:focus {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--accent2);
+            box-shadow: 0 0 10px rgba(72, 149, 239, 0.3);
+        }
+        
+        #goBtn { 
+            background: linear-gradient(45deg, var(--accent), #b5179e);
+            border: none; 
+            font-weight: 600; 
+            border-radius: 8px; 
+            transition: all .3s ease; 
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+        }
+        
+        #goBtn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 20px rgba(247, 37, 133, 0.5);
+        }
+        
+        .btn-shelters { 
+            background: linear-gradient(45deg, var(--accent2), #3a0ca3);
+            color: #fff; 
+            font-weight: 600; 
+            border-radius: 8px; 
+            transition: all .3s ease; 
+            box-shadow: 0 4px 15px rgba(72, 149, 239, 0.3);
+        }
+        
+        .btn-shelters:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(72, 149, 239, 0.5);
+        }
+        
+        #map { 
+            width: 100%; 
+            background: #000; 
+            position: relative;
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar { 
+            background: rgba(22,27,34,0.9); 
+            backdrop-filter: blur(20px); 
+            border-right: 1px solid rgba(255,255,255,0.1); 
+            padding: 1.5rem; 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 100vh; 
+            overflow-y: auto; 
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+        }
+        
+        .sidebar h4 { 
+            text-align: center; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+            margin-bottom: 1.5rem; 
+            color: #fff; 
+            text-shadow: 0 0 10px rgba(247, 37, 133, 0.5);
+        }
+        
+        .controls-container {
+            background: rgba(0,0,0,0.2);
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .controls-container label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .controls-container input, 
+        .controls-container .form-range {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .controls-container .btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .story { 
+            margin-top: 0.5rem; 
+            font-size: 1rem; 
+            line-height: 1.7; 
+            overflow-y: auto; 
+            max-height: 95vh; 
+        }
+        
+        .zone { 
+            min-height: 70vh; 
+            display: flex; 
+            align-items: center; 
+            padding: 2.5rem 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .zone h5 { 
+            color: var(--accent2); 
+            font-weight: 700; 
+            margin-bottom: 1rem; 
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px rgba(72, 149, 239, 0.3);
+        }
+        
+        .zone p {
+            color: rgba(201, 209, 217, 0.9);
+            line-height: 1.6;
+        }
+        
+        .final { 
+            min-height: 70vh; 
+            padding-top: 2.5rem; 
+        }
+        
+        .ring-label { 
+            background: rgba(0,0,0,0.85); 
+            color: #fff; 
+            font-size: .8rem; 
+            padding: .2rem .5rem; 
+            border-radius: 6px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        
+        /* Enhanced Map Effects */
+        .impact-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-fall 2s ease-out forwards;
+        }
+        
+        @keyframes particle-fall {
+            0% { transform: translateY(-100px) scale(0); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 0; }
+        }
+        
+        .shockwave {
+            position: absolute;
+            border: 2px solid gold;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: shockwave 1s ease-out infinite;
+        }
+        
+        @keyframes shockwave {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 100px; height: 100px; opacity: 0; }
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .impact-marker {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(247, 37, 133, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Indicator -->
+    <div class="loading" id="loadingIndicator">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Calculating Impact...</span>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark navbar-small">
+        <span class="navbar-brand mb-0 h6">🚀 AstroWave v1</span>
+    </nav>
+
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Sidebar -->
+            <div class="col-md-4 col-lg-3 px-0">
+                <div class="sidebar" id="sidebar">
+                    <h4>🌌 Impact Story</h4>
+                    
+                    <!-- Controls Section - Now part of scrollable content -->
+                    <div class="controls-container">
+                        <label>Latitude <input type="number" step="any" class="form-control" id="lat" value="37.8"></label>
+                        <label>Longitude <input type="number" step="any" class="form-control" id="lon" value="-122.4"></label>
+                        <label>Distance (km) <input type="number" step="any" class="form-control" id="dist" value="50"></label>
+                        <label>Energy (Mt) <input type="number" step="any" class="form-control" id="en" value="10000"></label>
+                        <label>Angle: <span id="angleVal">45°</span></label>
+                        <input type="range" class="form-range" id="angle" min="10" max="90" value="45">
+                        <button type="button" class="btn" id="goBtn">💥 Simulate</button>
+                        <a href="/shelters" class="btn btn-shelters d-block mt-2"><i class="fas fa-map-marker-alt"></i> Find Shelters</a>
+                    </div>
+                    
+                    <!-- Story Content -->
+                    <div class="zone" id="zone-crater">
+                        <div><h5>💥 Crater Zone</h5><p id="text-crater">Waiting for simulation…</p></div>
+                    </div>
+                    <div class="zone" id="zone-shock">
+                        <div><h5>💨 Shock-Wave Ring</h5><p id="text-shock">…</p></div>
+                    </div>
+                    <div class="zone" id="zone-quake">
+                        <div><h5>🌍 Seismic Circle</h5><p id="text-quake">…</p></div>
+                    </div>
+                    <div class="zone" id="zone-tsunami">
+                        <div><h5>🌊 Tsunami Range</h5><p id="text-tsunami">…</p></div>
+                    </div>
+                    <div class="final">
+                        <h5>🎬 Complete Scene</h5>
+                        <p>All hazard zones together at the impact site.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="col-md-8 col-lg-9 p-0">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize Leaflet map with enhanced tile layer
+        const map = L.map('map').setView([37.8, -122.4], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            opacity: 0.8
+        }).addTo(map);
+
+        const hazardGroup = L.layerGroup().addTo(map);
+        let impactPin = null;
+        let simData = null;
+        const zones = ['crater', 'shock', 'quake', 'tsunami'];
+
+        // Enhanced helper functions
+        function label(text, latlng) {
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'ring-label',
+                    html: text,
+                    iconSize: null
+                })
+            }).addTo(hazardGroup);
+        }
+
+        function impactEllipse(center, craterKm, angleDeg) {
+            const pts = [];
+            for (let t = 0; t <= 360; t += 5) {
+                const rad = (t + angleDeg) * Math.PI / 180;
+                const dx = craterKm * Math.cos(rad), dy = craterKm * Math.sin(rad);
+                pts.push([center[0] + dy / 111, center[1] + dx / 111]);
+            }
+            return pts;
+        }
+
+        // Enhanced particle effect
+        function createParticleEffect(latlng, count = 50) {
+            const pixelPoint = map.latLngToContainerPoint(latlng);
+            const mapContainer = document.getElementById('map');
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'impact-particle';
+                particle.style.left = pixelPoint.x + 'px';
+                particle.style.top = pixelPoint.y + 'px';
+                particle.style.animationDelay = (i * 0.02) + 's';
+                
+                const colors = ['#f72585', '#ff0a54', '#ff477e', '#ff6b9d'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                mapContainer.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 2000);
+            }
+        }
+
+        // Enhanced animations with visual effects
+        function animateCrater(c, R, a) {
+            createParticleEffect(c, 100);
+            
+            map.flyTo(c, 8, { duration: 1.5 });
+            let r = 0;
+            const crater = L.circle(c, {
+                color: '#8b0000',
+                fillColor: '#ff0000',
+                fillOpacity: 0.6,
+                weight: 3,
+                className: 'crater-circle'
+            }).addTo(hazardGroup);
+            
+            crater.setStyle({
+                fillOpacity: 0.7,
+                weight: 4,
+                color: '#b22222',
+                fillColor: 'radial-gradient(circle, #ff0000, #8b0000)'
+            });
+            
+            const iv = setInterval(() => {
+                r += R.crater * 1000 / 30;
+                crater.setRadius(r);
+                map.setView(c, 8, false);
+                if (r >= R.crater * 1000) {
+                    clearInterval(iv);
+                    
+                    hazardGroup.addLayer(L.polygon(impactEllipse(c, R.crater, a), {
+                        color: '#8b0000',
+                        fillColor: '#a52a2a',
+                        fillOpacity: 0.8,
+                        weight: 3
+                    }));
+                    
+                    label('💥 CRATER', c);
+                    setTimeout(() => label('🔥 CORE', c), 500);
+                }
+            }, 30);
+        }
+
+        function animateShock(c, R) {
+            const maxR = R.shock * 1000;
+            const step = maxR / 60;
+            
+            let r = 0;
+            const ring = L.circle(c, {
+                color: '#ffd700',
+                weight: 4,
+                fill: false,
+                dashArray: '10,10',
+                className: 'shockwave-circle'
+            }).addTo(hazardGroup);
+            
+            let pulse = true;
+            const pulseInterval = setInterval(() => {
+                ring.setStyle({
+                    weight: pulse ? 6 : 4,
+                    color: pulse ? '#ffff00' : '#ffd700'
+                });
+                pulse = !pulse;
+            }, 200);
+            
+            const iv = setInterval(() => {
+                r += step;
+                ring.setRadius(r);
+                
+                if (r % (step * 5) < step) {
+                    const pixelPoint = map.latLngToContainerPoint(c);
+                    const shockwave = document.createElement('div');
+                    shockwave.className = 'shockwave';
+                    shockwave.style.left = pixelPoint.x + 'px';
+                    shockwave.style.top = pixelPoint.y + 'px';
+                    shockwave.style.width = (r / map.getZoomScale(map.getZoom())) + 'px';
+                    shockwave.style.height = (r / map.getZoomScale(map.getZoom())) + 'px';
+                    
+                    document.getElementById('map').appendChild(shockwave);
+                    
+                    setTimeout(() => {
+                        shockwave.remove();
+                    }, 1000);
+                }
+                
+                if (r >= maxR) {
+                    clearInterval(iv);
+                    clearInterval(pulseInterval);
+                    ring.setStyle({
+                        fillColor: '#228b22',
+                        fillOpacity: 0.5,
+                        dashArray: '5,5'
+                    });
+                }
+            }, 20);
+        }
+
+        function animateQuake(c, R) {
+            let zoom = Math.min(12, Math.max(5, 15 - Math.log(R.quake * 1000) / Math.log(2)));
+            map.flyTo(c, zoom, { duration: 2 });
+            
+            const quake = L.circle(c, {
+                color: '#ffa500',
+                dashArray: '15,10,5,10',
+                weight: 4,
+                radius: R.quake * 1000,
+                fill: false,
+                className: 'quake-circle'
+            }).addTo(hazardGroup);
+            
+            let dashOffset = 0;
+            setInterval(() => {
+                dashOffset = (dashOffset + 5) % 30;
+                quake.setStyle({
+                    dashOffset: dashOffset
+                });
+            }, 100);
+            
+            let offset = 0;
+            const shake = setInterval(() => {
+                const latLng = map.getCenter();
+                const offsetLat = latLng.lat + (offset ? -0.03 : 0.03);
+                const offsetLng = latLng.lng + (offset ? -0.03 : 0.03);
+                map.setView([offsetLat, offsetLng], zoom, false);
+                offset = !offset;
+            }, 80);
+            
+            setTimeout(() => clearInterval(shake), 3000);
+            
+            label('🌍 SEISMIC', c);
+        }
+
+        function animateTsunami(c, R) {
+            map.flyTo(c, 5, { duration: 2 });
+            let waves = 0;
+            
+            function wave() {
+                let r = 0;
+                const ring = L.circle(c, {
+                    color: '#1e90ff',
+                    weight: 3,
+                    fill: false,
+                    dashArray: '8,8',
+                    className: 'tsunami-circle'
+                }).addTo(hazardGroup);
+                
+                const iv = setInterval(() => {
+                    r += R.tsunami * 1000 / 80;
+                    ring.setRadius(r);
+                    map.setView(c, 5, false);
+                    
+                    if (r % (R.tsunami * 1000 / 20) < R.tsunami * 1000 / 40) {
+                        ring.setStyle({
+                            weight: 5,
+                            color: '#00bfff'
+                        });
+                        setTimeout(() => {
+                            ring.setStyle({
+                                weight: 3,
+                                color: '#1e90ff'
+                            });
+                        }, 100);
+                    }
+                    
+                    if (r >= R.tsunami * 1000) {
+                        clearInterval(iv);
+                        waves++;
+                        if (waves < 5) setTimeout(wave, 500);
+                    }
+                }, 25);
+            }
+            wave();
+            label('🌊 TSUNAMI', c);
+        }
+
+        // Enhanced scroll and trigger functions
+        const sidebar = document.getElementById('sidebar');
+        let last = -1;
+
+        function onScroll() {
+            const st = sidebar.scrollTop;
+            const h = sidebar.scrollHeight - sidebar.clientHeight;
+            const idx = (h === 0) ? 0 : Math.min(3, Math.floor((st / h) * 4));
+            if (idx !== last) {
+                last = idx;
+                triggerZoneAnimation(zones[idx]);
+            }
+            if (st >= h - 20) triggerZoneAnimation('all');
+        }
+
+        function triggerZoneAnimation(z) {
+            if (!simData) return;
+            const c = simData.center, R = simData.radii, a = simData.angle;
+            hazardGroup.clearLayers();
+            if (impactPin) impactPin.addTo(hazardGroup);
+
+            switch (z) {
+                case 'crater': animateCrater(c, R, a); break;
+                case 'shock': animateShock(c, R); break;
+                case 'quake': animateQuake(c, R); break;
+                case 'tsunami': if (R.tsunami) animateTsunami(c, R); break;
+                case 'all':
+                    const craterPoly = L.polygon(impactEllipse(c, R.crater, a), {
+                        color: '#8b0000',
+                        fillColor: '#a52a2a',
+                        fillOpacity: 0.8,
+                        weight: 3
+                    }).addTo(hazardGroup);
+                    
+                    const shockCircle = L.circle(c, {
+                        color: '#ffd700',
+                        weight: 4,
+                        fill: false,
+                        radius: R.shock * 1000,
+                        fillColor: '#228b22',
+                        fillOpacity: 0.4,
+                        dashArray: '5,5'
+                    }).addTo(hazardGroup);
+                    
+                    const quakeCircle = L.circle(c, {
+                        color: '#ffa500',
+                        dashArray: '15,10,5,10',
+                        weight: 3,
+                        radius: R.quake * 1000,
+                        fill: false
+                    }).addTo(hazardGroup);
+                    
+                    if (R.tsunami) {
+                        const tsunamiCircle = L.circle(c, {
+                            color: '#1e90ff',
+                            weight: 3,
+                            fill: false,
+                            radius: R.tsunami * 1000,
+                            dashArray: '8,8'
+                        }).addTo(hazardGroup);
+                    }
+                    
+                    label('💥 CRATER', c);
+                    setTimeout(() => label('💨 SHOCK', c), 300);
+                    setTimeout(() => label('🌍 SEISMIC', c), 600);
+                    if (R.tsunami) setTimeout(() => label('🌊 TSUNAMI', c), 900);
+                    break;
+            }
+        }
+
+        // Enhanced simulation with visual feedback
+        async function simulate() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            
+            try {
+                hazardGroup.clearLayers();
+                const lat = parseFloat(document.getElementById('lat').value);
+                const lon = parseFloat(document.getElementById('lon').value);
+                const dist = parseFloat(document.getElementById('dist').value);
+                const en = parseFloat(document.getElementById('en').value);
+                const ang = parseFloat(document.getElementById('angle').value);
+
+                map.setView([lat, lon], 8);
+                await new Promise(r => map.once('moveend', r));
+                
+                zones.forEach(z => document.getElementById(`text-${z}`).textContent = 'Calculating impact effects... 🧪');
+                
+                createParticleEffect([lat, lon], 30);
+
+                const res = await fetch('/impact/sim', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lat, lon, dist, en, angle: ang })
+                }).then(r => r.json());
+
+                simData = {
+                    center: [lat, lon],
+                    angle: res.angle,
+                    radii: {
+                        crater: res.crater,
+                        shock: Math.min(res.crater * 8, 200),
+                        quake: Math.min(res.crater * 25, 500),
+                        tsunami: res.tsunami > 0 ? Math.min(res.crater * 15, 300) : 0
+                    },
+                    texts: res.texts
+                };
+
+                zones.forEach(z => document.getElementById(`text-${z}`).textContent = simData.texts[z] || '');
+
+                impactPin = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        html: '<i class="fa-solid fa-bomb" style="font-size:28px;color:var(--accent);text-shadow: 0 0 10px rgba(247, 37, 133, 0.7);"></i>',
+                        iconAnchor: [14, 28],
+                        popupAnchor: [0, -28],
+                        className: 'impact-marker'
+                    })
+                });
+
+                sidebar.scrollTop = 0;
+                triggerZoneAnimation('crater');
+
+            } catch (error) {
+                console.error('Simulation error:', error);
+                alert('Simulation failed. Please try again.');
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        // Enhanced event listeners
+        document.getElementById('goBtn').addEventListener('click', simulate);
+        document.getElementById('angle').addEventListener('input', e => {
+            document.getElementById('angleVal').textContent = e.target.value + '°';
+        });
+
+        sidebar.addEventListener('scroll', onScroll);
+
+        // Enhanced URL prefill
+        const p = new URLSearchParams(location.search);
+        ['lat', 'lon', 'dist', 'en'].forEach(k => {
+            if (p.has(k)) document.getElementById(k).value = parseFloat(p.get(k));
+        });
+        if (p.has('lat')) simulate();
+    </script>
+</body>
+</html>

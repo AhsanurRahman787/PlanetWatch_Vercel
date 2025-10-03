@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Asteroid Impact Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+        
+        #container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 700px;
+            box-shadow: 0 0 20px rgba(0, 100, 255, 0.5);
+        }
+        
+        canvas {
+            background: #000;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #title {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.8);
+            z-index: 10;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 16px;
+            color: #aaa;
+            z-index: 10;
+        }
+        
+        #damage-report-btn {
+            background: rgba(200, 50, 50, 0.7);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        #damage-report-btn:hover {
+            background: rgba(220, 70, 70, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="title">3D ASTEROID IMPACT SIMULATOR</div>
+        <canvas id="simulationCanvas"></canvas>
+        <div id="controls">
+            Press SPACE to reset the asteroid | Press R to reset
+            <br>
+            <button id="damage-report-btn">DAMAGE REPORT</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the canvas and context
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Create stars background
+        const stars = [];
+        for (let i = 0; i < 800; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2 + 0.5,
+                brightness: Math.floor(Math.random() * 100) + 155
+            });
+        }
+        
+        // Earth object with ultra-ultra-realistic appearance
+        const earth = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 150,
+            
+            draw: function() {
+                // Draw Earth with ultra-ultra-realistic appearance
+                this.drawOceans();
+                this.drawContinents();
+                this.drawIceCaps();
+                this.drawMountains();
+                this.drawDeserts();
+                this.drawForests();
+                this.drawClouds();
+                this.drawAtmosphere();
+            },
+            
+            drawOceans: function() {
+                // Create a realistic ocean gradient
+                const oceanGradient = ctx.createRadialGradient(
+                    this.x - this.radius * 0.3, this.y - this.radius * 0.3, 10,
+                    this.x, this.y, this.radius
+                );
+                oceanGradient.addColorStop(0, '#a0d8ff');
+                oceanGradient.addColorStop(0.3, '#3a7ca5');
+                oceanGradient.addColorStop(0.7, '#1b3b6f');
+                oceanGradient.addColorStop(1, '#0a1a3a');
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = oceanGradient;
+                ctx.fill();
+                
+                // Add ocean texture with waves
+                ctx.save();
+                ctx.clip();
+                
+                for (let i = 0; i < 800; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * this.radius * 0.95;
+                    const x = this.x + dist * Math.cos(angle);
+                    const y = this.y + dist * Math.sin(angle);
+                    const size = Math.random() * 1.5;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(100, 150, 200, ${Math.random() * 0.2})`;
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            },
+            
+            drawContinents: function() {
+                // North America
+                ctx.beginPath();
+                ctx.moveTo(this.x - 110, this.y - 30);
+                ctx.bezierCurveTo(
+                    this.x - 120, this.y - 60,
+                    this.x - 90, this.y - 80,
+                    this.x - 60, this.y - 60
+                );
+                ctx.bezierCurveTo(
+                    this.x - 40, this.y - 40,
+                    this.x - 30, this.y - 10,
+                    this.x - 60, this.y
+                );
+                ctx.bezierCurveTo(
+                    this.x - 90, this.y - 10,
+                    this.x - 100, this.y - 10,
+                    this.x - 110, this.y - 30
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+                
+                // South America
+                ctx.beginPath();
+                ctx.moveTo(this.x - 90, this.y + 40);
+                ctx.bezierCurveTo(
+                    this.x - 100, this.y + 60,
+                    this.x - 95, this.y + 90,
+                    this.x - 80, this.y + 110
+                );
+                ctx.bezierCurveTo(
+                    this.x - 70, this.y + 100,
+                    this.x - 65, this.y + 80,
+                    this.x - 70, this.y + 60
+                );
+                ctx.bezierCurveTo(
+                    this.x - 75, this.y + 50,
+                    this.x - 80, this.y + 45,
+                    this.x - 90, this.y + 40
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+                
+                // Europe
+                ctx.beginPath();
+                ctx.moveTo(this.x + 60, this.y - 60);
+                ctx.bezierCurveTo(
+                    this.x + 70, this.y - 70,
+                    this.x + 85, this.y - 65,
+                    this.x + 90, this.y - 50
+                );
+                ctx.bezierCurveTo(
+                    this.x + 85, this.y - 40,
+                    this.x + 70, this.y - 40,
+                    this.x + 60, this.y - 60
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+                
+                // Africa
+                ctx.beginPath();
+                ctx.moveTo(this.x + 40, this.y - 20);
+                ctx.bezierCurveTo(
+                    this.x + 60, this.y - 40,
+                    this.x + 80, this.y - 20,
+                    this.x + 85, this.y + 10
+                );
+                ctx.bezierCurveTo(
+                    this.x + 80, this.y + 40,
+                    this.x + 60, this.y + 60,
+                    this.x + 40, this.y + 50
+                );
+                ctx.bezierCurveTo(
+                    this.x + 30, this.y + 30,
+                    this.x + 30, this.y + 10,
+                    this.x + 40, this.y - 20
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+                
+                // Asia
+                ctx.beginPath();
+                ctx.moveTo(this.x + 90, this.y - 40);
+                ctx.bezierCurveTo(
+                    this.x + 120, this.y - 60,
+                    this.x + 140, this.y - 20,
+                    this.x + 130, this.y + 20
+                );
+                ctx.bezierCurveTo(
+                    this.x + 110, this.y + 40,
+                    this.x + 80, this.y + 30,
+                    this.x + 70, this.y
+                );
+                ctx.bezierCurveTo(
+                    this.x + 80, this.y - 20,
+                    this.x + 85, this.y - 30,
+                    this.x + 90, this.y - 40
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+                
+                // Australia
+                ctx.beginPath();
+                ctx.moveTo(this.x + 120, this.y + 90);
+                ctx.bezierCurveTo(
+                    this.x + 130, this.y + 100,
+                    this.x + 135, this.y + 110,
+                    this.x + 125, this.y + 120
+                );
+                ctx.bezierCurveTo(
+                    this.x + 115, this.y + 115,
+                    this.x + 110, this.y + 100,
+                    this.x + 120, this.y + 90
+                );
+                ctx.fillStyle = '#3a9c4e';
+                ctx.fill();
+            },
+            
+            drawMountains: function() {
+                // Draw mountain ranges
+                ctx.fillStyle = '#5a4a30';
+                
+                // Rocky Mountains (North America)
+                this.drawMountainRange(this.x - 90, this.y - 20, 20, 10, 5);
+                
+                // Andes (South America)
+                this.drawMountainRange(this.x - 85, this.y + 70, 15, 25, 6);
+                
+                // Alps (Europe)
+                this.drawMountainRange(this.x + 75, this.y - 45, 10, 8, 4);
+                
+                // Himalayas (Asia)
+                this.drawMountainRange(this.x + 110, this.y - 10, 20, 15, 6);
+                
+                // Atlas Mountains (Africa)
+                this.drawMountainRange(this.x + 55, this.y + 10, 12, 10, 4);
+            },
+            
+            drawMountainRange: function(x, y, width, height, peaks) {
+                for (let i = 0; i < peaks; i++) {
+                    const peakX = x + (i * width / peaks);
+                    const peakHeight = height * (0.7 + Math.random() * 0.3);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(peakX - width/(peaks*2), y);
+                    ctx.lineTo(peakX, y - peakHeight);
+                    ctx.lineTo(peakX + width/(peaks*2), y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            },
+            
+            drawDeserts: function() {
+                // Sahara Desert (Africa)
+                ctx.beginPath();
+                ctx.ellipse(this.x + 60, this.y, 25, 15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2b48c';
+                ctx.fill();
+                
+                // Arabian Desert (Asia)
+                ctx.beginPath();
+                ctx.ellipse(this.x + 80, this.y + 20, 15, 10, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2b48c';
+                ctx.fill();
+                
+                // Australian Desert (Australia)
+                ctx.beginPath();
+                ctx.ellipse(this.x + 120, this.y + 100, 20, 12, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2b48c';
+                ctx.fill();
+            },
+            
+            drawForests: function() {
+                // Amazon Rainforest (South America)
+                ctx.beginPath();
+                ctx.ellipse(this.x - 80, this.y + 70, 15, 20, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#2a8c3e';
+                ctx.fill();
+                
+                // Congo Rainforest (Africa)
+                ctx.beginPath();
+                ctx.ellipse(this.x + 50, this.y + 10, 12, 15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#2a8c3e';
+                ctx.fill();
+                
+                // Siberian Forest (Asia)
+                ctx.beginPath();
+                ctx.ellipse(this.x + 100, this.y - 30, 25, 15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#2a8c3e';
+                ctx.fill();
+            },
+            
+            drawIceCaps: function() {
+                // Draw Arctic ice cap
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y - this.radius * 0.8, 60, 20, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fill();
+                
+                // Draw Antarctic ice cap
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y + this.radius * 0.8, 50, 15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fill();
+            },
+            
+            drawClouds: function() {
+                // Draw clouds with realistic formations
+                ctx.globalAlpha = 0.7;
+                
+                // Cloud formations over North America
+                this.drawCloud(this.x - 80, this.y - 50, 20, 10);
+                this.drawCloud(this.x - 60, this.y - 40, 25, 12);
+                this.drawCloud(this.x - 70, this.y - 20, 18, 8);
+                
+                // Cloud formations over Europe
+                this.drawCloud(this.x + 70, this.y - 55, 15, 8);
+                this.drawCloud(this.x + 80, this.y - 45, 20, 10);
+                
+                // Cloud formations over Africa
+                this.drawCloud(this.x + 60, this.y, 20, 10);
+                this.drawCloud(this.x + 70, this.y + 15, 22, 12);
+                
+                // Cloud formations over Asia
+                this.drawCloud(this.x + 110, this.y - 10, 25, 12);
+                this.drawCloud(this.x + 120, this.y + 5, 20, 10);
+                this.drawCloud(this.x + 100, this.y + 20, 18, 8);
+                
+                // Cloud formations over South America
+                this.drawCloud(this.x - 85, this.y + 60, 15, 8);
+                
+                // Cloud formations over Australia
+                this.drawCloud(this.x + 125, this.y + 100, 15, 7);
+                
+                ctx.globalAlpha = 1.0;
+            },
+            
+            drawCloud: function(x, y, width, height) {
+                // Draw a realistic cloud using multiple overlapping circles
+                const segments = 5;
+                for (let i = 0; i < segments; i++) {
+                    const offsetX = (Math.random() - 0.5) * width * 0.6;
+                    const offsetY = (Math.random() - 0.5) * height * 0.6;
+                    const size = Math.random() * width * 0.4 + width * 0.3;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fill();
+                }
+            },
+            
+            drawAtmosphere: function() {
+                // Draw atmospheric glow
+                const glow = ctx.createRadialGradient(
+                    this.x, this.y, this.radius,
+                    this.x, this.y, this.radius * 1.1
+                );
+                glow.addColorStop(0, 'rgba(100, 150, 255, 0.3)');
+                glow.addColorStop(1, 'rgba(100, 150, 255, 0)');
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 1.1, 0, Math.PI * 2);
+                ctx.fillStyle = glow;
+                ctx.fill();
+            }
+        };
+        
+        // Asteroid object
+        const asteroid = {
+            x: 0,
+            y: 0,
+            size: 20,
+            speed: 0,
+            dx: 0,
+            dy: 0,
+            trail: [],
+            maxTrail: 20,
+            impact: false,
+            exploding: false,
+            explosionRadius: 0,
+            explosionMaxRadius: 300,
+            explosionGrowthRate: 15,
+            hasHit: false,
+            
+            init: function() {
+                // Start from outside the screen
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.max(canvas.width, canvas.height) * 1.5;
+                this.x = canvas.width / 2 + distance * Math.cos(angle);
+                this.y = canvas.height / 2 + distance * Math.sin(angle);
+                
+                // Calculate direction towards Earth
+                const dx = canvas.width / 2 - this.x;
+                const dy = canvas.height / 2 - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                this.speed = Math.random() * 4 + 3;
+                this.dx = (dx / dist) * this.speed;
+                this.dy = (dy / dist) * this.speed;
+                
+                this.trail = [];
+                this.impact = false;
+                this.exploding = false;
+                this.explosionRadius = 0;
+                this.hasHit = false;
+            },
+            
+            update: function() {
+                if (!this.impact && !this.hasHit) {
+                    // Add current position to trail
+                    this.trail.push({x: this.x, y: this.y});
+                    if (this.trail.length > this.maxTrail) {
+                        this.trail.shift();
+                    }
+                    
+                    // Move asteroid
+                    this.x += this.dx;
+                    this.y += this.dy;
+                    
+                    // Check for impact
+                    const dx = this.x - canvas.width / 2;
+                    const dy = this.y - canvas.height / 2;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (distance < earth.radius + this.size) {
+                        this.impact = true;
+                        this.exploding = true;
+                        this.hasHit = true;
+                    }
+                } else if (this.exploding) {
+                    this.explosionRadius += this.explosionGrowthRate;
+                    if (this.explosionRadius > this.explosionMaxRadius) {
+                        this.exploding = false;
+                    }
+                }
+            },
+            
+            draw: function() {
+                if (!this.impact && !this.hasHit) {
+                    // Draw trail
+                    for (let i = 0; i < this.trail.length; i++) {
+                        const point = this.trail[i];
+                        const alpha = i / this.trail.length;
+                        const size = this.size * (i / this.trail.length);
+                        
+                        ctx.beginPath();
+                        ctx.arc(point.x, point.y, size/3, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(200, 200, 200, ${alpha * 0.5})`;
+                        ctx.fill();
+                    }
+                    
+                    // Draw asteroid
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = '#7a6a50';
+                    ctx.fill();
+                    
+                    // Draw craters on asteroid
+                    for (let i = 0; i < 5; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = Math.random() * (this.size - 5);
+                        const craterX = this.x + dist * Math.cos(angle);
+                        const craterY = this.y + dist * Math.sin(angle);
+                        const craterSize = Math.random() * (this.size/3) + 2;
+                        
+                        ctx.beginPath();
+                        ctx.arc(craterX, craterY, craterSize, 0, Math.PI * 2);
+                        ctx.fillStyle = '#5a4a30';
+                        ctx.fill();
+                    }
+                } else if (this.exploding) {
+                    // Draw explosion
+                    const gradient = ctx.createRadialGradient(
+                        canvas.width/2, canvas.height/2, 0,
+                        canvas.width/2, canvas.height/2, this.explosionRadius
+                    );
+                    gradient.addColorStop(0, 'rgba(255, 255, 200, 0.8)');
+                    gradient.addColorStop(0.5, 'rgba(255, 165, 0, 0.6)');
+                    gradient.addColorStop(1, 'rgba(255, 50, 50, 0)');
+                    
+                    ctx.beginPath();
+                    ctx.arc(canvas.width/2, canvas.height/2, this.explosionRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // Draw explosion particles
+                    for (let i = 0; i < 50; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = Math.random() * this.explosionRadius;
+                        const x = canvas.width/2 + dist * Math.cos(angle);
+                        const y = canvas.height/2 + dist * Math.sin(angle);
+                        const size = Math.random() * 5 + 2;
+                        
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 100 + 100)}, 0, ${Math.random() * 0.8 + 0.2})`;
+                        ctx.fill();
+                    }
+                    
+                    // Draw shockwave
+                    ctx.beginPath();
+                    ctx.arc(canvas.width/2, canvas.height/2, this.explosionRadius * 1.2, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(255, 200, 100, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+        };
+        
+        // Initialize the asteroid
+        asteroid.init();
+        
+        // Animation loop
+        function animate() {
+            // Clear canvas with a dark background
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stars
+            for (const star of stars) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness/255})`;
+                ctx.fill();
+            }
+            
+            // Draw Earth (static, no rotation)
+            earth.draw();
+            
+            // Update and draw asteroid
+            asteroid.update();
+            asteroid.draw();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Start the animation
+        animate();
+        
+        // Event listeners for controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'KeyR') {
+                asteroid.init();
+            }
+        });
+        
+        document.getElementById('damage-report-btn').addEventListener('click', () => {
+            window.location.href = '/impact';
+        });
+    </script>
+</body>
+</html>

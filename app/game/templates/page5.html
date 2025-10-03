@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Cards with Next Button</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        header {
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-header {
+            padding: 25px 20px 15px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: #4ecca3;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .card-content {
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .card-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background: rgba(0, 0, 0, 0.15);
+            margin-top: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ecca3;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .next-stage-btn {
+            background: linear-gradient(to right, #4ecca3, #2a9d8f);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .next-stage-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to right, #5de0b7, #34b3a3);
+        }
+        
+        .next-stage-btn:active {
+            transform: translateY(1px);
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project Stages</h1>
+            <p class="subtitle">Complete each stage to unlock the next level. Click the button below when you're ready to advance.</p>
+        </header>
+        
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h2 class="card-title">Foundation</h2>
+                </div>
+                <div class="card-content">
+                    <p>Establish the core principles and initial setup for your project. This stage focuses on planning and initial development.</p>
+                    <p>Key objectives include defining requirements, setting up development environment, and creating initial architecture.</p>
+                </div>
+                <div class="card-stats">
+                    <div class="stat">
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Tasks</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h2 class="card-title">Development</h2>
+                </div>
+                <div class="card-content">
+                    <p>Implementation phase where the core functionality is developed. This stage involves coding, testing, and integration.</p>
+                    <p>Focus on building robust features while maintaining code quality and performance standards.</p>
+                </div>
+                <div class="card-stats">
+                    <div class="stat">
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Tasks</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h2 class="card-title">Deployment</h2>
+                </div>
+                <div class="card-content">
+                    <p>Final stage where the project is deployed to production. Includes final testing, optimization, and user training.</p>
+                    <p>Ensure all systems are operational and users are ready to utilize the new solution effectively.</p>
+                </div>
+                <div class="card-stats">
+                    <div class="stat">
+                        <div class="stat-value">30%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Tasks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="next-stage-btn" id="nextStageBtn">
+            <i class="fas fa-arrow-right"></i>
+            Proceed to Next Stage: /neo
+        </button>
+    </div>
+    
+    <footer>
+        <p>Project Management System &copy; 2023 | All stages completed successfully</p>
+    </footer>
+
+    <script>
+        document.getElementById('nextStageBtn').addEventListener('click', function() {
+            // Redirect to /neo after a short delay to show the button press effect
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+            this.disabled = true;
+            
+            setTimeout(function() {
+                window.location.href = '/neo';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

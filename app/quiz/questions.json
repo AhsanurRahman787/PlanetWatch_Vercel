@@ -1,0 +1,30 @@
+[
+  {
+    "q": "Which parameter best describes how stretched an orbit is?",
+    "type": "mcq",
+    "choices": ["Inclination", "Eccentricity", "Semi-major axis", "Argument of periapsis"],
+    "answer": 1
+  },
+  {
+    "q": "Explain in ≤2 sentences why an asteroid with semi-major axis < 1 AU can still miss Earth.",
+    "type": "text",
+    "keywords": ["inclination", "node", "timing"]
+  },
+  {
+    "q": "What is the approximate kinetic energy (in J) of a 50 m diameter stony asteroid hitting at 20 km s⁻¹?",
+    "type": "mcq",
+    "choices": ["≈ 4×10¹⁴ J", "≈ 4×10¹⁵ J", "≈ 4×10¹⁶ J", "≈ 4×10¹⁷ J"],
+    "answer": 1
+  },
+  {
+    "q": "Name one method to deflect an asteroid given 20 years warning.",
+    "type": "text",
+    "keywords": ["gravity tractor", "kinetic impactor", "ion beam", "nuke"]
+  },
+  {
+    "q": "Which coordinate tells us how tilted an orbit is relative to Earth’s orbital plane?",
+    "type": "mcq",
+    "choices": ["Longitude of ascending node", "Argument of periapsis", "Inclination", "True anomaly"],
+    "answer": 2
+  }
+]

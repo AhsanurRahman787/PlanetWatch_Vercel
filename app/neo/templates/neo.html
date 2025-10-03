@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NEO Orbit Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#000;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+
+    /* ---------- 3D plot fills the screen ---------- */
+    #plot3d{position:absolute;inset:0;height:100vh;width:100vw;}
+
+    /* ---------- left sidebar ---------- */
+    #leftBar{
+      position:absolute;
+      top:15px;left:15px;bottom:15px;
+      width:300px;z-index:10;
+      display:flex;flex-direction:column;gap:12px;
+    }
+
+    /* ---------- glass panel ---------- */
+    .glass{
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:10px;
+      padding:12px;
+      font-size:14px;
+    }
+
+    /* ---------- orbit controls ---------- */
+    #orbitControls{flex-shrink:0;}
+    #orbitControls label{display:block;margin:6px 0;}
+    #orbitControls input[type=range]{width:100%;}
+    .btn-sm{padding:4px 8px;margin-top:6px;font-size:12px;border:none;border-radius:4px;cursor:pointer;}
+    .btn-light{background:#ddd;color:#000;}
+    .btn-primary{background:#0d6efd;color:#fff;padding:6px 12px;text-decoration:none;border-radius:4px;display:inline-block;}
+
+    /* ---------- chatbot ---------- */
+    #chatbox{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    #chat-messages{flex:1;overflow-y:auto;padding:10px;font-size:14px;}
+    #chat-messages div{margin-bottom:6px;line-height:1.4;}
+    .msg-user{color:#0d6efd;}
+    .msg-bot{color:#ffd166;}
+    #chat-input{display:flex;border-top:1px solid rgba(255,255,255,.15);}
+    #chat-input input{flex:1;padding:8px;border:none;outline:none;background:transparent;color:#fff;}
+    #chat-input button{border:none;background:#0d6efd;color:#fff;padding:0 12px;cursor:pointer;}
+
+    /* ---------- proceed button ---------- */
+    .text-center{text-align:center;margin-top:1rem;position:relative;z-index:5;}
+  </style>
+</head>
+<body>
+
+<!-- ========== LEFT SIDEBAR ========== -->
+<aside id="leftBar">
+  <!-- Orbit Controls -->
+  <section id="orbitControls" class="glass">
+    <label><input type="checkbox" id="rotate" checked> Auto-rotate</label>
+    <label>Speed: <span id="speedVal">0.3°</span></label>
+    <input type="range" id="speed" min="0" max="2" step="0.1" value="0.3">
+    <label>Zoom: <span id="zoomVal">1.6</span></label>
+    <input type="range" id="zoom" min="0.1" max="50" step="0.1" value="0.1">
+    <label><input type="checkbox" id="axes" checked> Show axes/grid</label>
+    <div>
+      <button class="btn-sm btn-light" id="reset">Reset Camera</button>
+      <button class="btn-sm btn-light" id="pause">Pause</button>
+    </div>
+  </section>
+
+  <!-- Chatbot -->
+  <section id="chatbox" class="glass">
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="chat-text" placeholder="Ask about NEOs...">
+      <button id="micBtn">🎤</button>
+      <button id="sendBtn">➤</button>
+    </div>
+  </section>
+</aside>
+
+<!-- ========== 3D PLOT ========== -->
+<div id="plot3d"></div>
+
+<!-- ========== PROCEED BUTTON ========== -->
+<div class="text-center">
+  <a class="btn-primary" href="/quiz/page3">Proceed to next step →</a>
+</div>
+
+<script>
+/* ---------------- Orbit Plot ---------------- */
+fetch('/neo/data')
+  .then(r=>r.json())
+  .then(js=>{
+    const layout={
+      paper_bgcolor:'#000',plot_bgcolor:'#000',
+      scene:{
+        bgcolor:'#000',
+        xaxis:{visible:true,showgrid:true,color:'#aaa',autorange:true},
+        yaxis:{visible:true,showgrid:true,color:'#aaa',autorange:true},
+        zaxis:{visible:true,showgrid:true,color:'#aaa',autorange:true},
+        camera:{eye:{x:1.6,y:1.6,z:1.6},center:{x:0,y:0,z:0},up:{x:0,y:0,z:1},projection:{type:'perspective'}}
+      },
+      margin:{l:0,r:0,t:0,b:0},showlegend:false
+    };
+    const config={
+      displayModeBar:true,
+      modeBarButtonsToAdd:['resetCameraDefault3d'],
+      modeBarButtonsToRemove:['toImage'],
+      scrollZoom:true,responsive:true
+    };
+    Plotly.newPlot('plot3d',js.traces,layout,config);
+
+    let angle=0,running=true;
+    const chk=document.getElementById('rotate');
+    const speed=document.getElementById('speed');
+    const speedVal=document.getElementById('speedVal');
+    const zoom=document.getElementById('zoom');
+    const zoomVal=document.getElementById('zoomVal');
+    const axes=document.getElementById('axes');
+
+    function spin(){
+      if(chk.checked&&running) angle+=parseFloat(speed.value);
+      const rad=angle*Math.PI/180;
+      const d=parseFloat(zoom.value);
+      Plotly.relayout('plot3d',{'scene.camera.eye':{x:d*Math.cos(rad),y:d*Math.sin(rad),z:d*0.8}});
+      requestAnimationFrame(spin);
+    }
+    spin();
+
+    speed.addEventListener('input',()=>{speedVal.textContent=speed.value+'°';});
+    zoom.addEventListener('input',()=>{
+      zoomVal.textContent=zoom.value;
+      const rad=angle*Math.PI/180;
+      const d=parseFloat(zoom.value);
+      Plotly.relayout('plot3d',{'scene.camera.eye':{x:d*Math.cos(rad),y:d*Math.sin(rad),z:d*0.8}});
+    });
+    document.getElementById('reset').onclick=()=>{
+      zoom.value=1.6;zoomVal.textContent='1.6';angle=0;
+      Plotly.relayout('plot3d',{'scene.camera.eye':{x:1.6,y:1.6,z:1.6}});
+    };
+    document.getElementById('pause').onclick=e=>{
+      running=!running;e.target.textContent=running?'Pause':'Resume';
+    };
+    axes.addEventListener('change',()=>{
+      const v=axes.checked;
+      Plotly.relayout('plot3d',{
+        'scene.xaxis.visible':v,'scene.yaxis.visible':v,'scene.zaxis.visible':v,
+        'scene.xaxis.showgrid':v,'scene.yaxis.showgrid':v,'scene.zaxis.showgrid':v
+      });
+    });
+  });
+
+/* ---------------- Chatbot ---------------- */
+const chatMessages=document.getElementById('chat-messages');
+const chatText=document.getElementById('chat-text');
+const sendBtn=document.getElementById('sendBtn');
+const micBtn=document.getElementById('micBtn');
+
+function addMsg(text,cls){
+  const div=document.createElement('div');
+  div.textContent=text;
+  div.className=cls;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+
+async function sendMessage(){
+  const msg=chatText.value.trim();
+  if(!msg) return;
+  addMsg("You: "+msg,"msg-user");
+  chatText.value="";
+  try{
+    const r=await fetch("/neo/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:msg,want_audio:true})
+    });
+    const data=await r.json();
+    addMsg("Bot: "+data.reply,"msg-bot");
+
+    if(data.reply_audio){
+      const audio=new Audio("data:audio/mp3;base64,"+data.reply_audio);
+      audio.play();
+    }else{
+      if(window.speechSynthesis){
+        const utter=new SpeechSynthesisUtterance(data.reply);
+        speechSynthesis.speak(utter);
+      }
+    }
+  }catch(err){
+    addMsg("Error: "+err,"msg-bot");
+  }
+}
+sendBtn.onclick=sendMessage;
+chatText.addEventListener("keypress",e=>{if(e.key==="Enter") sendMessage();});
+
+/* --- Speech to Text --- */
+let recognition;
+if("webkitSpeechRecognition" in window){
+  recognition=new webkitSpeechRecognition();
+  recognition.continuous=false; recognition.lang="en-US"; recognition.interimResults=false;
+  recognition.onresult=e=>{ chatText.value=e.results[0][0].transcript; sendMessage(); };
+}
+micBtn.onclick=()=>{
+  if(recognition) recognition.start(); else alert("Speech recognition not supported in this browser.");
+};
+
+/* ---- auto-ask first question ---- */
+window.addEventListener('DOMContentLoaded', () => {
+  const opening = "Hi! I’m your NEO assistant—what would you like to know about near-Earth objects such as PHA which can kill us all?";
+  addMsg("Bot: " + opening, "msg-bot");   // uses your existing addMsg helper
+
+  // optional: also speak it
+  if (window.speechSynthesis) {
+    const utter = new SpeechSynthesisUtterance(opening);
+    speechSynthesis.speak(utter);
+  }
+});
+
+</script>
+
+</body>
+</html>

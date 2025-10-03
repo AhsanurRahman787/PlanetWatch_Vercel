@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 Space-Themed Asteroid Policy Chat</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #e0f7ff;
+      font-family: 'Exo 2', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    
+    .nebula-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 30%, rgba(25, 25, 112, 0.3) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(75, 0, 130, 0.3) 0%, transparent 40%),
+                  radial-gradient(circle at 50% 50%, rgba(0, 0, 50, 0.7) 0%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 10;
+      padding-top: 2rem;
+      padding-bottom: 3rem;
+    }
+    
+    .header-container {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+    
+    .header-container::after {
+      content: "";
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #00bfff, #00ffea, #00bfff, transparent);
+      border-radius: 2px;
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #00bfff, #00ffea, #7d5fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+      letter-spacing: 1.5px;
+      margin-bottom: 1rem;
+    }
+    
+    .subtitle {
+      color: #a0d8ff;
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .input-group {
+      background: rgba(10, 20, 40, 0.7);
+      border-radius: 12px;
+      padding: 8px;
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.2);
+      backdrop-filter: blur(10px);
+      max-width: 800px;
+      margin: 0 auto 2.5rem;
+    }
+    
+    .input-group input {
+      background: rgba(5, 15, 30, 0.8);
+      border: 1px solid rgba(0, 150, 255, 0.4);
+      color: #e0f7ff;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-family: 'Exo 2', sans-serif;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group input::placeholder {
+      color: #6ca0d8;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #00bfff;
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.3);
+    }
+    
+    .btn-send {
+      background: linear-gradient(135deg, #0066cc, #00bfff);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 25px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
+    }
+    
+    .btn-send:hover {
+      background: linear-gradient(135deg, #0055aa, #00a0e0);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 191, 255, 0.6);
+    }
+    
+    .chat-feed {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: rgba(10, 20, 40, 0.7);
+      border: 1px solid rgba(0, 150, 255, 0.3);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(0, 191, 255, 0.3);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .card-subtitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .user-primary {
+      background: rgba(0, 150, 255, 0.2);
+      color: #4fc3f7;
+      border: 1px solid rgba(0, 150, 255, 0.4);
+    }
+    
+    .user-system {
+      background: rgba(125, 95, 255, 0.2);
+      color: #b388ff;
+      border: 1px solid rgba(125, 95, 255, 0.4);
+    }
+    
+    .card-text {
+      color: #e0f7ff;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-outline-primary {
+      border-color: rgba(0, 191, 255, 0.5);
+      color: #4fc3f7;
+      background: rgba(0, 191, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+      background: rgba(0, 191, 255, 0.3);
+      border-color: #00bfff;
+    }
+    
+    .btn-outline-secondary {
+      border-color: rgba(125, 95, 255, 0.5);
+      color: #b388ff;
+      background: rgba(125, 95, 255, 0.1);
+    }
+    
+    .btn-outline-secondary:hover {
+      background: rgba(125, 95, 255, 0.3);
+      border-color: #7d5fff;
+    }
+    
+    .btn-outline-success {
+      border-color: rgba(0, 255, 200, 0.5);
+      color: #64ffda;
+      background: rgba(0, 255, 200, 0.1);
+    }
+    
+    .btn-outline-success:hover {
+      background: rgba(0, 255, 200, 0.3);
+      border-color: #00ffcc;
+    }
+    
+    .replies {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px dashed rgba(0, 150, 255, 0.3);
+    }
+    
+    .reply-card {
+      margin-left: 25px !important;
+      border-left: 2px solid rgba(0, 191, 255, 0.4);
+    }
+    
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+      background: rgba(0, 100, 200, 0.2);
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      border-radius: 5px;
+    }
+    
+    .bg-success {
+      background: linear-gradient(90deg, #00c853, #64ffda) !important;
+    }
+    
+    .bg-warning {
+      background: linear-gradient(90deg, #ffab00, #ffd166) !important;
+    }
+    
+    .bg-danger {
+      background: linear-gradient(90deg, #ff1744, #ff5252) !important;
+    }
+    
+    .typing-indicator {
+      display: inline-block;
+      padding: 3px 8px;
+      background: rgba(0, 150, 255, 0.2);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+    
+    .planet-decoration {
+      position: absolute;
+      border-radius: 50%;
+      z-index: -1;
+    }
+    
+    .planet-1 {
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, #4a00e0, #8e2de2);
+      top: 10%;
+      right: 5%;
+      opacity: 0.15;
+    }
+    
+    .planet-2 {
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, #00b09b, #96c93d);
+      bottom: 15%;
+      left: 8%;
+      opacity: 0.1;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #6ca0d8;
+      font-size: 0.9rem;
+      padding: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .input-group .btn {
+        align-self: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div class="nebula-overlay"></div>
+<div class="planet-decoration planet-1"></div>
+<div class="planet-decoration planet-2"></div>
+
+<div class="container">
+  <div class="header-container">
+    <h1>🚀 ASTEROID POLICY COMMAND CENTER</h1>
+    <p class="subtitle">Submit your planetary defense policies and receive AI evaluations from our cosmic policy advisors</p>
+  </div>
+
+  <div class="input-group mb-4">
+    <input type="text" id="userName" class="form-control" placeholder="Your name">
+    <input type="text" id="country" class="form-control" placeholder="Country">
+    <input type="text" id="message" class="form-control" placeholder="Ask a question or submit a policy">
+    <button class="btn btn-send" onclick="sendMessage()">Send</button>
+  </div>
+
+  <div id="chatFeed" class="chat-feed"></div>
+  
+  <div class="footer">
+    <p>Galactic Policy Network • Secure • Encrypted • Interstellar</p>
+  </div>
+</div>
+
+<script>
+// ===== STARFIELD =====
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
+let stars=[], STAR_COUNT=200;
+function resizeCanvas(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+for(let i=0;i<STAR_COUNT;i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, z:Math.random()*canvas.width, o:Math.random()});
+function animateStars(){
+  ctx.fillStyle="black"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let s of stars){
+    s.z-=2; if(s.z<=0){s.x=Math.random()*canvas.width; s.y=Math.random()*canvas.height; s.z=canvas.width;}
+    let sx=(s.x-canvas.width/2)*(canvas.width/s.z)+canvas.width/2;
+    let sy=(s.y-canvas.height/2)*(canvas.width/s.z)+canvas.height/2;
+    let r=(1-s.z/canvas.width)*2;
+    ctx.beginPath(); ctx.arc(sx,sy,r,0,Math.PI*2); ctx.fillStyle=`rgba(255,255,255,${s.o})`; ctx.fill();
+  }
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+// ===== END STARFIELD =====
+
+// ===== CHAT SYSTEM =====
+const chatFeed = document.getElementById("chatFeed");
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
+let nextId = posts.length ? Math.max(...posts.map(p=>p.id))+1 : 1;
+
+// Pre-filled demo
+if(posts.length===0){
+  posts=[
+    {id:nextId++, user:"Alice", country:"USA", message:"Implement a nationwide asteroid detection satellite network.", likes:5, system:false,
+     replies:[{id:nextId++, user:"AI", country:"USA", message:`<div><p><strong>Policy Rating:</strong> 85/100</p><div class="progress mb-2"><div class="progress-bar bg-success" role="progressbar" style="width:85%;"></div></div><p><strong>Reason:</strong> Excellent initiative, but lacks international collaboration and long-term funding plan.</p></div>`, likes:0, system:true, replies:[]}]},
+    {id:nextId++, user:"Bob", country:"Japan", message:"Fund research for asteroid deflection lasers.", likes:3, system:false,
+     replies:[{id:nextId++, user:"AI", country:"Japan", message:`<div><p><strong>Policy Rating:</strong> 70/100</p><div class="progress mb-2"><div class="progress-bar bg-warning" role="progressbar" style="width:70%;"></div></div><p><strong>Reason:</strong> Innovative technology, but unclear on budget allocation, testing feasibility, and international cooperation.</p></div>`, likes:0, system:true, replies:[]}]},
+    {id:nextId++, user:"Clara", country:"Germany", message:"Launch a public awareness campaign about asteroid impact risks.", likes:2, system:false,
+     replies:[{id:nextId++, user:"AI", country:"Germany", message:`<div><p><strong>Policy Rating:</strong> 60/100</p><div class="progress mb-2"><div class="progress-bar bg-warning" role="progressbar" style="width:60%;"></div></div><p><strong>Reason:</strong> Good for awareness, but effectiveness depends on public engagement and education programs.</p></div>`, likes:0, system:true, replies:[]}]},
+  ];
+  localStorage.setItem("posts", JSON.stringify(posts));
+}
+
+// ===== RENDER =====
+function renderChat(){chatFeed.innerHTML=""; posts.forEach(p=>chatFeed.appendChild(createPostCard(p)));}
+function createPostCard(post,isReply=false){
+  const card=document.createElement("div");
+  card.className=`card mb-3 ${post.system?"system-post":""} ${isReply?"reply-card":""}`;
+  card.innerHTML=`
+    <div class="card-body">
+      <h6 class="card-subtitle mb-2">
+        ${post.user} 
+        <span class="user-badge ${post.system?"user-system":"user-primary"}">
+          ${post.country} ${post.system?"💡 AI":""}
+        </span>
+      </h6>
+      <p class="card-text">${post.message}</p>
+      <div class="card-actions">
+        <button class="btn btn-outline-primary btn-sm like-btn">Like (${post.likes})</button>
+        ${!post.system?'<button class="btn btn-outline-secondary btn-sm reply-btn">Reply</button>':''}
+        ${!post.system?'<button class="btn btn-outline-success btn-sm evaluate-btn">Evaluate</button>':''}
+      </div>
+      <div class="replies mt-2"></div>
+    </div>`;
+  
+  card.querySelector(".like-btn").addEventListener("click",()=>{post.likes++; saveAndRender();});
+  
+  const replyBtn=card.querySelector(".reply-btn");
+  if(replyBtn){replyBtn.addEventListener("click", async()=>{
+    const replyMsg=prompt("Enter reply:"); const replyUser=prompt("Your name:"); const replyCountry=prompt("Your country:");
+    if(!replyMsg||!replyUser||!replyCountry) return;
+    const replyPost={id:nextId++, user:replyUser, country:replyCountry, message:replyMsg, likes:0, system:false, replies:[]};
+    post.replies.push(replyPost); saveAndRender();
+    const typing={id:nextId++, user:"AI", country:replyCountry, message:"<span class='typing-indicator'>AI is analyzing...</span>", likes:0, system:true, replies:[]};
+    replyPost.replies.push(typing); saveAndRender();
+    const res=await fetch("/shelters/policy-maker/ask_ai",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:replyMsg,country:replyCountry,mode:"reply"})});
+    const data=await res.json();
+    const idx=replyPost.replies.findIndex(r=>r.id===typing.id);
+    if(idx!==-1){replyPost.replies[idx].message=data.ai_reply||"AI analysis failed."; saveAndRender();}
+  });}
+
+  const evalBtn=card.querySelector(".evaluate-btn");
+  if(evalBtn){evalBtn.addEventListener("click", async()=>{
+    const typing={id:nextId++, user:"AI", country:post.country, message:"<span class='typing-indicator'>Evaluating policy...</span>", likes:0, system:true, replies:[]};
+    post.replies.push(typing); saveAndRender();
+    const res=await fetch("/shelters/policy-maker/ask_ai",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:post.message,country:post.country,mode:"evaluate"})});
+    const data=await res.json();
+    const idx=post.replies.findIndex(r=>r.id===typing.id);
+    if(idx!==-1){
+      post.replies[idx].message=`<div><p><strong>Policy Rating:</strong> ${data.rating}/100</p><div class="progress mb-2"><div class="progress-bar ${data.rating>70?'bg-success':data.rating>40?'bg-warning':'bg-danger'}" role="progressbar" style="width:${data.rating}%;"></div></div><p><strong>Reason:</strong> ${data.reason}</p></div>`;
+      saveAndRender();
+    }
+  });}
+
+  const repliesDiv=card.querySelector(".replies");
+  post.replies.forEach(r=>repliesDiv.appendChild(createPostCard(r,true)));
+  return card;
+}
+
+function saveAndRender(){localStorage.setItem("posts", JSON.stringify(posts)); renderChat();}
+
+async function sendMessage(){
+  const user=document.getElementById("userName").value.trim();
+  const country=document.getElementById("country").value.trim();
+  const msg=document.getElementById("message").value.trim();
+  if(!user||!country||!msg) return alert("Fill all fields.");
+  const newPost={id:nextId++, user, country, message:msg, likes:0, system:false, replies:[]};
+  posts.unshift(newPost); saveAndRender(); document.getElementById("message").value="";
+
+  // AI reply
+  const typingAI={id:nextId++, user:"AI", country, message:"<span class='typing-indicator'>AI is analyzing...</span>", likes:0, system:true, replies:[]};
+  newPost.replies.push(typingAI); saveAndRender();
+  const resReply=await fetch("/shelters/policy-maker/ask_ai",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:msg,country,mode:"reply"})});
+  const dataReply=await resReply.json();
+  const idxAI=newPost.replies.findIndex(r=>r.id===typingAI.id);
+  if(idxAI!==-1){newPost.replies[idxAI].message=dataReply.ai_reply||"AI analysis failed."; saveAndRender();}
+
+  // Generate policy
+  const typingPolicy={id:nextId++, user:"AI", country, message:"<span class='typing-indicator'>Generating policy...</span>", likes:0, system:true, replies:[]};
+  newPost.replies.push(typingPolicy); saveAndRender();
+  const resPolicy=await fetch("/shelters/policy-maker/ask_ai",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:msg,country,mode:"generate_policy"})});
+  const dataPolicy=await resPolicy.json();
+  const idxPolicy=newPost.replies.findIndex(r=>r.id===typingPolicy.id);
+  if(idxPolicy!==-1){
+    newPost.replies[idxPolicy].replies.push({id:nextId++, user:"AI", country, message:dataPolicy.generated_policy||"Policy generation failed.", likes:0, system:true, replies:[]});
+    saveAndRender();
+  }
+}
+
+renderChat();
+</script>
+</body>
+</html>

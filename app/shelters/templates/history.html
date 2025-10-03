@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroid History</title>
+    <style>
+        /* Space-themed background */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #0a0e21; /* Deep space blue */
+            color: #e0e0ff; /* Light blue-white text */
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated star background effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            z-index: -1;
+            animation: twinkle 5s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgba(15, 23, 42, 0.85); /* Dark blue container */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(100, 100, 255, 0.2);
+            border: 1px solid #4f46e5; /* Indigo border */
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            color: #a5b4fc; /* Light indigo */
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(165, 180, 252, 0.5);
+        }
+        
+        h2 {
+            color: #c7d2fe; /* Lighter indigo */
+            border-bottom: 1px solid #4f46e5;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 15px;
+        }
+        
+        .highlight {
+            background: rgba(79, 70, 229, 0.15); /* Indigo highlight */
+            padding: 20px;
+            border-left: 4px solid #818cf8; /* Light purple */
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .links-section {
+            background: rgba(30, 41, 59, 0.9); /* Darker slate */
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 1px solid #3730a3; /* Dark purple */
+        }
+        
+        .links-section h3 {
+            color: #a5b4fc;
+            margin-top: 0;
+        }
+        
+        .links-section ul {
+            padding-left: 20px;
+        }
+        
+        .links-section li {
+            margin-bottom: 12px;
+        }
+        
+        .links-section a {
+            color: #bfdbfe; /* Light blue link */
+            text-decoration: none;
+        }
+        
+        .links-section a:hover {
+            color: #60a5fa; /* Hover color */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The History of Asteroid Discovery and Understanding</h1>
+
+        <p>The study of asteroids, rocky remnants from the early solar system, spans over two centuries. These celestial bodies have evolved from mere points of light between planets to objects of intense scientific interest, revealing secrets about the formation and evolution of our cosmic neighborhood.</p>
+
+        <div class="highlight">
+            <h2>Early Discoveries: The Dawn of Asteroid Astronomy</h2>
+            <p>The first asteroid, Ceres, was discovered on January 1, 1801, by Italian astronomer Giuseppe Piazzi. Initially thought to be a new planet, Ceres was found in the gap between Mars and Jupiter, as predicted by the Titius-Bode law. Shortly after, Heinrich Olbers discovered Pallas in 1802, leading him to propose the idea that these objects might be fragments of a larger planet that had broken apart. This marked the beginning of the classification of these bodies as "asteroids," meaning "star-like," due to their appearance as points of light in telescopes.</p>
+        </div>
+
+        <h2>19th Century Expansion</h2>
+        <p>The 19th century saw a steady increase in asteroid discoveries. Vesta was found in 1807, and by the 1860s, the number of known asteroids had grown significantly. Improved telescopes and systematic searches, such as those by Max Wolf who pioneered the use of astrophotography, led to the discovery of hundreds of new asteroids. This period established the main asteroid belt as a distinct region populated by countless small bodies.</p>
+
+        <h2>20th Century: Physical Understanding</h2>
+        <p>The 20th century brought advancements in understanding the physical properties of asteroids. Spectroscopic analysis allowed astronomers to classify asteroids into different types (like C-type, S-type, etc.) based on their composition. Missions like Galileo (launched in 1989) provided the first close-up images of an asteroid (Gaspra in 1991) and later asteroid 951 Gaspra and 243 Ida, revealing their irregular shapes, cratered surfaces, and even the presence of tiny moons like Dactyl orbiting Ida.</p>
+
+        <h2>Modern Era: Missions and Impact Awareness</h2>
+        <p>The 21st century has been defined by dedicated asteroid missions and a heightened awareness of their potential impact threat. Missions like NEAR Shoemaker (orbiting and landing on Eros), Dawn (visiting Vesta and Ceres), and more recently OSIRIS-REx (visiting Bennu) and DART (testing asteroid deflection on Dimorphos) have provided unprecedented data on asteroid geology, history, and potential resources. These missions confirmed that asteroids are diverse, ancient, and hold clues to the solar system's formation.</p>
+
+        <h2>Conclusion</h2>
+        <p>From being considered a missing planet to being recognized as crucial building blocks of the solar system, asteroids have profoundly shaped our understanding of planetary science. Their history of discovery reflects the evolution of astronomy itself, from visual observations to sophisticated space missions. Today, they are studied not only for their scientific value but also for their potential as resources and the hazards they might pose.</p>
+
+        <!-- Updated Links Section with Space UI -->
+        <div class="links-section">
+            <h3>Learn More About Asteroids</h3>
+            <ul>
+                <li><a href="https://www.nasa.gov/asteroids" target="_blank">NASA Asteroid Watch</a> - Official NASA resource on asteroids, including discovery, characterization, and potential hazards.</li>
+                <li><a href="https://cneos.jpl.nasa.gov/" target="_blank">NASA's Center for Near Earth Object Studies (CNEOS)</a> - Comprehensive data and information on near-Earth objects.</li>
+                <li><a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/" target="_blank">JPL Small-Body Database Browser</a> - Search for specific asteroid data from NASA's Jet Propulsion Laboratory.</li>
+                <li><a href="https://en.wikipedia.org/wiki/Asteroid" target="_blank">Wikipedia: Asteroid</a> - A detailed overview covering history, composition, classification, and more.</li>
+                <li><a href="https://www.lpi.usra.edu/education/resources/asteroids/" target="_blank">Lunar and Planetary Institute: Asteroid Resources</a> - Educational materials and resources about asteroids.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

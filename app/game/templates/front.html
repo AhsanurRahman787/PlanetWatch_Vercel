@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Navigator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 3s) infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #8a2be2, #00bfff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0ff;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .navigation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .nav-btn {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            background: rgba(20, 20, 60, 0.7);
+            border: 2px solid rgba(100, 100, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(100, 100, 255, 0.2);
+            z-index: 3;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 30px rgba(100, 100, 255, 0.5);
+            border-color: rgba(100, 100, 255, 0.8);
+        }
+        
+        .nav-btn i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #8a2be2;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover i {
+            color: #00bfff;
+            transform: scale(1.2);
+        }
+        
+        .nav-btn span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .planet-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #8a2be2);
+            top: 10%;
+            left: 5%;
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+            opacity: 0.7;
+        }
+        
+        .planet-2 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at 30% 30%, #4deeea, #00a8ff);
+            bottom: 15%;
+            right: 10%;
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.5);
+            opacity: 0.6;
+        }
+        
+        .comet {
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #00bfff, #8a2be2);
+            border-radius: 50%;
+            top: 30%;
+            left: -100px;
+            animation: comet 15s linear infinite;
+            box-shadow: 0 0 10px #00bfff;
+        }
+        
+        @keyframes comet {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(110vw) translateY(200px); opacity: 0; }
+        }
+        
+        .comet:nth-child(2) {
+            top: 60%;
+            animation: comet 18s linear 3s infinite;
+        }
+        
+        .comet:nth-child(3) {
+            top: 10%;
+            animation: comet 20s linear 6s infinite;
+        }
+        
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #a0a0ff;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .navigation-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .nav-btn {
+                width: 150px;
+                height: 150px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navigation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-btn {
+                width: 140px;
+                height: 140px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="planet planet-1"></div>
+    <div class="planet planet-2"></div>
+    
+    <div class="comet"></div>
+    <div class="comet"></div>
+    <div class="comet"></div>
+    
+    <div class="container">
+        <header>
+            <h1>PlanetWatch</h1>
+            <p class="subtitle">Embark on an interstellar journey. Select a level to explore the wonders of the universe.</p>
+        </header>
+        
+        <div class="navigation-grid">
+            <a href="/neo" class="nav-btn">
+                <i class="fas fa-rocket"></i>
+                <span>NEO Tracker</span>
+            </a>
+            <a href="/quiz" class="nav-btn">
+                <i class="fas fa-satellite"></i>
+                <span>Impacter 25</span>
+            </a>
+            <a href="/impact" class="nav-btn">
+                <i class="fas fa-meteor"></i>
+                <span>impact sim</span>
+            </a>
+            <a href="/shelters/history" class="nav-btn">
+                <i class="fas fa-user-astronaut"></i>
+                <span>History</span>
+            </a>
+            <a href="/game" class="nav-btn">
+                <i class="fas fa-atom"></i>
+                <span>policy maker</span>
+            </a>
+            <a href="/shelters/policymaker" class="nav-btn">
+                <i class="fas fa-robot"></i>
+                <span>policy search</span>
+            </a>
+        </div>
+        
+        <footer>
+            <p>PlanetWatch | Explore the Final Frontier</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create stars for the background
+        const starsContainer = document.getElementById('stars');
+        const starCount = 200;
+        
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            
+            // Random position
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            
+            // Random size
+            const size = Math.random() * 3;
+            
+            // Random animation duration
+            const duration = 2 + Math.random() * 5;
+            
+            star.style.left = `${x}%`;
+            star.style.top = `${y}%`;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.setProperty('--duration', `${duration}s`);
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            
+            starsContainer.appendChild(star);
+        }
+        
+        // Add subtle parallax effect to buttons
+        document.addEventListener('mousemove', (e) => {
+            const buttons = document.querySelectorAll('.nav-btn');
+            const x = (window.innerWidth - e.pageX) / 50;
+            const y = (window.innerHeight - e.pageY) / 50;
+            
+            buttons.forEach((btn, index) => {
+                const speed = 0.05 * (index + 1);
+                btn.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

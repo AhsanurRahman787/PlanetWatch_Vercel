@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shelter Finder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ---------- 3-CSS ---------- -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0e0e0e;
+  --panel:#1a1a1a;
+  --card:#222;
+  --accent:#00ff8c;
+  --accent-dark:#00c46b;
+  --text:#f2f2f2;
+  --muted:#8c8c8c;
+  --radius:12px;
+  --shadow:0 8px 24px rgba(0,0,0,.45);
+}
+html,body{height:100%;margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{text-decoration:none}
+/* ---------- layout ---------- */
+.wrapper{display:flex;height:100%;overflow:hidden}
+.sidebar{width:340px;background:var(--panel);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.map-wrapper{flex:1;position:relative;background:#000}
+#mapFrame{width:100%;height:100%;border:none}
+/* ---------- logo ---------- */
+.brand{padding:1.2rem 1.5rem;font-weight:700;font-size:1.25rem;color:var(--accent);letter-spacing:.5px}
+/* ---------- form ---------- */
+.form-area{flex:none;padding:0 1.5rem 1rem}
+.form-control{background:var(--card);border:1px solid #333;color:var(--text);border-radius:8px;padding:.55rem .75rem;font-size:.95rem}
+.form-control:focus{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 .2rem rgba(0,255,140,.15);color:var(--text)}
+.form-label{margin-bottom:.35rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.btn-accent{background:var(--accent);color:#000;border:none;font-weight:600;border-radius:8px;padding:.55rem;transition:background .2s}
+.btn-accent:hover{background:var(--accent-dark)}
+.btn-outline-secondary{border:1px solid #444;color:var(--muted);font-size:.85rem;padding:.4rem .75rem;border-radius:8px}
+.btn-outline-secondary:hover{background:#333;color:var(--text)}
+/* ---------- chat ---------- */
+.chat-area{flex:1;display:flex;flex-direction:column;padding:0 1.5rem 1rem;min-height:0}
+.chatbox{flex:1;background:var(--card);border-radius:var(--radius);padding:.8rem 1rem;font-size:.9rem;overflow-y:auto;margin-bottom:.6rem;box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
+.chatbox .sys{color:var(--accent)}
+.chatbox .user{color:#5ac8fa}
+.chatbox .bot{color:#eee}
+.chat-input-group{display:flex;gap:.5rem}
+.chat-input{flex:1;background:var(--card);border:1px solid #333;color:var(--text);border-radius:8px;padding:.55rem .75rem;font-size:.9rem}
+.chat-input:focus{outline:none;border-color:var(--accent)}
+/* ---------- mobile ---------- */
+@media(max-width:768px){
+  .wrapper{flex-direction:column}
+  .sidebar{width:100%;height:40%;box-shadow:none;border-bottom:1px solid #333}
+  .map-wrapper{height:60%}
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- ---------- SIDEBAR ---------- -->
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-location-dot me-2"></i>Shelter Finder</div>
+
+    <form id="shelterForm" class="form-area">
+      <div class="mb-2">
+        <label class="form-label">Latitude</label>
+        <input type="number" step="any" class="form-control" name="lat" value="37.8" required>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Longitude</label>
+        <input type="number" step="any" class="form-control" name="lon" value="-122.4" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Search radius (km)</label>
+        <input type="number" step="1" class="form-control" name="search_radius_km" value="20">
+      </div>
+      <button type="submit" class="btn-accent w-100 mb-2">Find Shelters</button>
+      <a href="/shelters/download-map" class="btn-outline-secondary w-100">Download Map</a>
+    </form>
+
+    <div class="chat-area">
+      <div class="chatbox" id="chatbox"></div>
+      <div class="chat-input-group">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about shelters…">
+        <button class="btn-accent" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ---------- MAP ---------- -->
+  <main class="map-wrapper">
+    <iframe id="mapFrame"></iframe>
+  </main>
+</div>
+
+<!-- ---------- JS ---------- -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ---------- dom ---------- */
+const chatbox   = document.getElementById('chatbox');
+const chatInput = document.getElementById('chatInput');
+const sendBtn   = document.getElementById('sendBtn');
+
+/* ---------- shelter map ---------- */
+document.getElementById('shelterForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const body = new FormData(e.target);
+  const res  = await fetch('/shelters/generate',{method:'POST',body});
+  const data = await res.json();
+
+  if(data.map_html){
+    const iframe = document.getElementById('mapFrame');
+    const doc = iframe.contentWindow.document;
+    doc.open(); doc.write(data.map_html); doc.close();
+  }
+  pushMessage('system','System',data.message);
+});
+
+/* ---------- chat ---------- */
+async function askQuestion(){
+  const q = chatInput.value.trim();
+  if(!q) return;
+  pushMessage('user','You',q);
+  chatInput.value='';
+
+  const res = await fetch('/shelters/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question:q})
+  });
+  const data = await res.json();
+  pushMessage('bot','Bot',data.answer);
+}
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter') askQuestion()});
+sendBtn.addEventListener('click',askQuestion);
+
+function pushMessage(cls,name,txt){
+  chatbox.insertAdjacentHTML('beforeend',`<div class="${cls}"><b>${name}:</b> ${txt}</div>`);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+</script>
+</body>
+</html>

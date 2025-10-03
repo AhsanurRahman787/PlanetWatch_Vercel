@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroid Defense: Earth's Last Stand</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c1445, #1a237e);
+            color: #e0f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4fc3f7;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
+            background: linear-gradient(to right, #4fc3f7, #29b6f6, #039be5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(13, 19, 33, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            font-size: 1.8rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(25, 118, 210, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .threat-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .threat-item {
+            background: rgba(33, 150, 243, 0.15);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #ff5252;
+        }
+        
+        .threat-item.high {
+            border-left-color: #ff1744;
+        }
+        
+        .threat-item.medium {
+            border-left-color: #ff9800;
+        }
+        
+        .threat-item.low {
+            border-left-color: #4caf50;
+        }
+        
+        .threat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .threat-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .budget-allocation {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .budget-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .budget-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #2c3e50;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4fc3f7;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
+        }
+        
+        .allocation-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .tech-card {
+            background: rgba(41, 182, 246, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(79, 195, 247, 0.3);
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+            background: rgba(41, 182, 246, 0.25);
+            border-color: #4fc3f7;
+        }
+        
+        .tech-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .tech-card.locked:hover {
+            transform: none;
+        }
+        
+        .tech-cost {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            color: #ff9800;
+        }
+        
+        .tech-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, #2196f3, #21cbf3);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .news-feed {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            min-height: 80px;
+        }
+        
+        .news-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .game-over-content {
+            background: rgba(13, 19, 33, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            border: 2px solid #4fc3f7;
+        }
+        
+        .game-over h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ff5252;
+        }
+        
+        .game-over.win h2 {
+            color: #4caf50;
+        }
+        
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .asteroid-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .asteroid {
+            position: absolute;
+            background: #ff5722;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ff5722;
+        }
+        
+        .earth {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #4fc3f7, #1976d2);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(79, 195, 247, 0.7);
+            z-index: -1;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4fc3f7;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* AI Advisor Styles */
+        .advisor-content {
+            padding: 15px 0;
+        }
+        
+        #advisorResponse {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 10px;
+            min-height: 100px;
+        }
+        
+        .tts-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .tts-btn {
+            background: rgba(25, 118, 210, 0.3);
+            border: 1px solid #4fc3f7;
+            color: #4fc3f7;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tts-btn:hover {
+            background: rgba(25, 118, 210, 0.5);
+        }
+        
+        .tts-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .tts-btn.active {
+            background: #4fc3f7;
+            color: #0c1445;
+        }
+    </style>
+</head>
+<body>
+    <div class="asteroid-animation" id="asteroidAnimation"></div>
+    <div class="earth"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Policy Maker</h1>
+            <p class="subtitle">As Director of the Global Asteroid Defense Initiative, allocate resources wisely to protect Earth from extinction-level threats</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="panel">
+                <h2 class="panel-title">🌍 Global Status</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="year">2025</div>
+                        <div class="stat-label">Year</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="budget">$12.5B</div>
+                        <div class="stat-label">Budget</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="approval">78%</div>
+                        <div class="stat-label">Public Approval</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="threats">3</div>
+                        <div class="stat-label">Active Threats</div>
+                    </div>
+                </div>
+                
+                <h2 class="panel-title">☄️ Asteroid Threats</h2>
+                <div class="threat-list" id="threatList">
+                    <!-- Threats will be populated here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2 class="panel-title">💰 Budget Allocation</h2>
+                <div class="budget-allocation">
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <span>Detection Systems</span>
+                            <span id="detectPerc">30%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="detectSlider" min="0" max="100" value="30">
+                            <div class="allocation-value" id="detectValue">$3.75B</div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <span>Deflection R&D</span>
+                            <span id="deflectPerc">40%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="deflectSlider" min="0" max="100" value="40">
+                            <div class="allocation-value" id="deflectValue">$5.00B</div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <span>Civil Defense</span>
+                            <span id="civilPerc">15%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="civilSlider" min="0" max="100" value="15">
+                            <div class="allocation-value" id="civilValue">$1.88B</div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <span>Diplomacy</span>
+                            <span id="diploPerc">10%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="diploSlider" min="0" max="100" value="10">
+                            <div class="allocation-value" id="diploValue">$1.25B</div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <span>Public Outreach</span>
+                            <span id="outreachPerc">5%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="outreachSlider" min="0" max="100" value="5">
+                            <div class="allocation-value" id="outreachValue">$0.63B</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button id="allocateBtn">Allocate Budget</button>
+                    <button id="nextYearBtn">Advance to Next Year</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <div class="panel">
+                <h2 class="panel-title">🔬 Technology Research</h2>
+                <div class="tech-grid" id="techGrid">
+                    <!-- Tech cards will be populated here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2 class="panel-title">🤖 AI Advisor: Skynet</h2>
+                <div class="advisor-content">
+                    <p>Request strategic advice from your AI advisor based on the current game state.</p>
+                    <button id="askAdvisorBtn">Get AI Recommendation</button>
+                    <div class="advisor-response" id="advisorResponse">
+                        <div id="adviceContent">Click "Get AI Recommendation" to receive strategic advice</div>
+                        <div class="tts-controls">
+                            <button id="speakBtn" class="tts-btn" disabled>🔊 Speak</button>
+                            <button id="stopBtn" class="tts-btn" disabled>⏹️ Stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2 class="panel-title">📰 Global News</h2>
+            <div class="news-feed" id="newsFeed">
+                <div class="news-item">Welcome to the Global Asteroid Defense Initiative! Your mission begins now.</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="game-over" id="gameOver">
+        <div class="game-over-content">
+            <h2 id="gameOverTitle">GAME OVER</h2>
+            <p id="gameOverMessage">Earth has been destroyed by an asteroid impact. Humanity's legacy ends here.</p>
+            <button id="restartBtn">Restart Game</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            year: 2025,
+            budget: 12500, // in millions (12.5B)
+            approval: 78,
+            threats: [],
+            technologies: {
+                detection1: { name: "Ground Telescopes", cost: 1000, researched: true, description: "Basic asteroid detection network" },
+                detection2: { name: "Space Observatories", cost: 3000, researched: false, description: "Advanced space-based detection" },
+                deflect1: { name: "Kinetic Impactor", cost: 2000, researched: false, description: "Smash asteroids off course" },
+                deflect2: { name: "Gravity Tractor", cost: 4000, researched: false, description: "Gently tug asteroids using gravity" },
+                civil1: { name: "Evacuation Plans", cost: 1500, researched: false, description: "Reduce casualties from impacts" },
+                diplo1: { name: "Global Alliance", cost: 2500, researched: false, description: "Secure international funding" }
+            },
+            news: ["Welcome to the Global Asteroid Defense Initiative! Your mission begins now."],
+            gameOver: false,
+            victory: false
+        };
+
+        // DOM Elements
+        const yearEl = document.getElementById('year');
+        const budgetEl = document.getElementById('budget');
+        const approvalEl = document.getElementById('approval');
+        const threatsEl = document.getElementById('threats');
+        const threatListEl = document.getElementById('threatList');
+        const newsFeedEl = document.getElementById('newsFeed');
+        const gameOverEl = document.getElementById('gameOver');
+        const gameOverTitleEl = document.getElementById('gameOverTitle');
+        const gameOverMessageEl = document.getElementById('gameOverMessage');
+        
+        // Budget sliders
+        const sliders = {
+            detect: document.getElementById('detectSlider'),
+            deflect: document.getElementById('deflectSlider'),
+            civil: document.getElementById('civilSlider'),
+            diplo: document.getElementById('diploSlider'),
+            outreach: document.getElementById('outreachSlider')
+        };
+        
+        const percEls = {
+            detect: document.getElementById('detectPerc'),
+            deflect: document.getElementById('deflectPerc'),
+            civil: document.getElementById('civilPerc'),
+            diplo: document.getElementById('diploPerc'),
+            outreach: document.getElementById('outreachPerc')
+        };
+        
+        const valueEls = {
+            detect: document.getElementById('detectValue'),
+            deflect: document.getElementById('deflectValue'),
+            civil: document.getElementById('civilValue'),
+            diplo: document.getElementById('diploValue'),
+            outreach: document.getElementById('outreachValue')
+        };
+        
+        // Text-to-speech elements
+        const speakBtn = document.getElementById('speakBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const adviceContent = document.getElementById('adviceContent');
+        let speechSynthesis = window.speechSynthesis;
+        let isSpeaking = false;
+
+        // Initialize sliders
+        Object.keys(sliders).forEach(key => {
+            sliders[key].addEventListener('input', updateBudgetAllocation);
+        });
+        
+        function updateBudgetAllocation() {
+            // Get slider values
+            const detect = parseInt(sliders.detect.value);
+            const deflect = parseInt(sliders.deflect.value);
+            const civil = parseInt(sliders.civil.value);
+            const diplo = parseInt(sliders.diplo.value);
+            const outreach = parseInt(sliders.outreach.value);
+            
+            // Calculate total to normalize
+            const total = detect + deflect + civil + diplo + outreach;
+            
+            // Normalize to 100%
+            const detectNorm = total > 0 ? Math.round((detect / total) * 100) : 20;
+            const deflectNorm = total > 0 ? Math.round((deflect / total) * 100) : 20;
+            const civilNorm = total > 0 ? Math.round((civil / total) * 100) : 20;
+            const diploNorm = total > 0 ? Math.round((diplo / total) * 100) : 20;
+            const outreachNorm = 100 - detectNorm - deflectNorm - civilNorm - diploNorm;
+            
+            // Update percentages
+            percEls.detect.textContent = `${detectNorm}%`;
+            percEls.deflect.textContent = `${deflectNorm}%`;
+            percEls.civil.textContent = `${civilNorm}%`;
+            percEls.diplo.textContent = `${diploNorm}%`;
+            percEls.outreach.textContent = `${outreachNorm}%`;
+            
+            // Update dollar values
+            valueEls.detect.textContent = `$${(gameState.budget * detectNorm / 100 / 1000).toFixed(2)}B`;
+            valueEls.deflect.textContent = `$${(gameState.budget * deflectNorm / 100 / 1000).toFixed(2)}B`;
+            valueEls.civil.textContent = `$${(gameState.budget * civilNorm / 100 / 1000).toFixed(2)}B`;
+            valueEls.diplo.textContent = `$${(gameState.budget * diploNorm / 100 / 1000).toFixed(2)}B`;
+            valueEls.outreach.textContent = `$${(gameState.budget * outreachNorm / 100 / 1000).toFixed(2)}B`;
+        }
+        
+        // Initialize budget display
+        updateBudgetAllocation();
+        
+        // Generate random asteroid threat
+        function generateThreat() {
+            const sizes = ['Small (50m)', 'Medium (200m)', 'Large (500m)', 'Massive (1km+)'];
+            const compositions = ['Rocky', 'Metallic', 'Rubble Pile'];
+            const trajectories = ['Direct Impact', 'Near Miss', 'Gravitational Keyhole'];
+            
+            const sizeIndex = Math.floor(Math.random() * sizes.length);
+            const threat = {
+                id: Date.now(),
+                name: `Asteroid ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(Math.random() * 1000)}`,
+                size: sizes[sizeIndex],
+                composition: compositions[Math.floor(Math.random() * compositions.length)],
+                trajectory: trajectories[Math.floor(Math.random() * trajectories.length)],
+                yearsUntilImpact: Math.floor(Math.random() * 10) + 5, // 5-15 years
+                risk: sizeIndex + 1, // 1-4 (1=low, 4=extreme)
+                detected: false
+            };
+            
+            return threat;
+        }
+        
+        // Add new threat
+        function addThreat() {
+            if (Math.random() > 0.7) { // 30% chance each year
+                const threat = generateThreat();
+                gameState.threats.push(threat);
+                addNews(`New threat detected: ${threat.name} (${threat.size})`);
+            }
+        }
+        
+        // Update threats
+        function updateThreats() {
+            // Decrease years until impact
+            gameState.threats.forEach(threat => {
+                threat.yearsUntilImpact--;
+                
+                // Detect threats based on detection budget
+                if (!threat.detected && Math.random() < 0.3) {
+                    threat.detected = true;
+                    addNews(`Detected: ${threat.name} - ${threat.yearsUntilImpact} years until potential impact!`);
+                }
+            });
+            
+            // Remove threats that have impacted or passed
+            gameState.threats = gameState.threats.filter(threat => {
+                if (threat.yearsUntilImpact <= 0) {
+                    // Impact!
+                    if (threat.risk >= 3) {
+                        // Catastrophic impact
+                        gameState.gameOver = true;
+                        addNews(`CATASTROPHE: ${threat.name} has impacted Earth!`);
+                    } else {
+                        // Smaller impact
+                        addNews(`IMPACT: ${threat.name} struck Earth causing regional damage.`);
+                        gameState.approval = Math.max(20, gameState.approval - 15);
+                    }
+                    return false;
+                }
+                return true;
+            });
+            
+            // Check for victory condition
+            if (gameState.year >= 2045 && !gameState.gameOver) {
+                gameState.victory = true;
+                gameState.gameOver = true;
+            }
+        }
+        
+        // Add news item
+        function addNews(message) {
+            gameState.news.unshift(message);
+            if (gameState.news.length > 5) {
+                gameState.news.pop();
+            }
+        }
+        
+        // Allocate budget
+        document.getElementById('allocateBtn').addEventListener('click', () => {
+            if (gameState.gameOver) return;
+            
+            // Get allocation percentages
+            const detectPerc = parseInt(percEls.detect.textContent);
+            const deflectPerc = parseInt(percEls.deflect.textContent);
+            const civilPerc = parseInt(percEls.civil.textContent);
+            const diploPerc = parseInt(percEls.diplo.textContent);
+            const outreachPerc = parseInt(percEls.outreach.textContent);
+            
+            // Calculate actual spending
+            const detectSpend = gameState.budget * detectPerc / 100;
+            const deflectSpend = gameState.budget * deflectPerc / 100;
+            const civilSpend = gameState.budget * civilPerc / 100;
+            const diploSpend = gameState.budget * diploPerc / 100;
+            const outreachSpend = gameState.budget * outreachPerc / 100;
+            
+            // Update approval based on outreach and civil defense
+            gameState.approval = Math.min(100, Math.max(30, 
+                gameState.approval + (outreachSpend / 100) - (gameState.threats.length * 2)
+            ));
+            
+            // Add news about allocation
+            addNews(`Budget allocated: Detection ${detectPerc}%, Deflection ${deflectPerc}%, Civil ${civilPerc}%`);
+            
+            // Enable tech research based on spending
+            if (deflectSpend > 1500 && !gameState.technologies.deflect1.researched) {
+                gameState.technologies.deflect1.researched = true;
+                addNews("Kinetic Impactor technology successfully developed!");
+            }
+            
+            if (detectSpend > 2000 && !gameState.technologies.detection2.researched) {
+                gameState.technologies.detection2.researched = true;
+                addNews("Space Observatories deployed - detection capabilities enhanced!");
+            }
+            
+            // Update UI
+            render();
+        });
+        
+        // Advance to next year
+        document.getElementById('nextYearBtn').addEventListener('click', () => {
+            if (gameState.gameOver) return;
+            
+            gameState.year++;
+            
+            // Add new threats
+            addThreat();
+            
+            // Update existing threats
+            updateThreats();
+            
+            // Calculate new budget based on diplomacy and approval
+            let budgetChange = 0;
+            const diploPerc = parseInt(percEls.diplo.textContent);
+            budgetChange += (diploPerc / 100) * 1000; // Diplomacy increases funding
+            
+            // Approval affects budget
+            if (gameState.approval < 50) {
+                budgetChange -= 500; // Budget cuts
+            } else if (gameState.approval > 80) {
+                budgetChange += 300; // Bonus funding
+            }
+            
+            gameState.budget = Math.max(5000, gameState.budget + budgetChange);
+            
+            // Add news about the year
+            addNews(`Year ${gameState.year}: Global situation update`);
+            
+            // Check game over conditions
+            if (gameState.approval <= 30) {
+                gameState.gameOver = true;
+                addNews("Public approval has collapsed! GADI has been disbanded.");
+            }
+            
+            if (gameState.budget <= 5000) {
+                addNews("Severe budget constraints threaten our operations.");
+            }
+            
+            // Render updated game state
+            render();
+            
+            // Show game over screen if needed
+            if (gameState.gameOver) {
+                setTimeout(showGameOver, 1000);
+            }
+        });
+        
+        // Get AI advice - FIXED URL TO /game/get_advice
+        document.getElementById('askAdvisorBtn').addEventListener('click', async () => {
+            const advisorBtn = document.getElementById('askAdvisorBtn');
+            const advisorResponse = document.getElementById('advisorResponse');
+            
+            // Show loading state
+            advisorBtn.innerHTML = '<span class="loading"></span> Consulting AI Advisor...';
+            advisorBtn.disabled = true;
+            speakBtn.disabled = true;
+            stopBtn.disabled = true;
+            
+            try {
+                // Get current game state
+                const gameStateCopy = {
+                    year: gameState.year,
+                    budget: gameState.budget,
+                    approval: gameState.approval,
+                    threats: [...gameState.threats],
+                    technologies: {...gameState.technologies}
+                };
+                
+                // FIXED: Use correct URL with /game prefix
+                const response = await fetch('/game/get_advice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ game_state: gameStateCopy })
+                });
+                
+                // Check if response is OK
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Check if response is actually JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Received HTML instead of JSON');
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    adviceContent.innerHTML = `<p style="color: #ff5252;">Advisor Error: ${data.error}</p>`;
+                } else {
+                    // Format response with bullet points
+                    let formattedResponse = data.advice
+                        .replace(/\*\s/g, '<li>')
+                        .replace(/(\d+)\.\s/g, '<strong>$1.</strong> ')
+                        .replace(/\n/g, '</li><br>');
+                    
+                    // Wrap in ul if it contains list items
+                    if (formattedResponse.includes('<li>')) {
+                        formattedResponse = '<ul>' + formattedResponse.replace(/<\/li><br>$/, '</li>') + '</ul>';
+                    }
+                    
+                    adviceContent.innerHTML = formattedResponse;
+                }
+                
+                // Enable speak button only when there's content
+                if (data.advice && !data.error) {
+                    speakBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('AI Advisor Error:', error);
+                adviceContent.innerHTML = `<p style="color: #ff5252;">Connection error: ${error.message}</p>`;
+            } finally {
+                advisorBtn.innerHTML = 'Get AI Recommendation';
+                advisorBtn.disabled = false;
+            }
+        });
+        
+        // Text-to-Speech functionality
+        function speakText(text) {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            // Find a female voice if available
+            const voices = speechSynthesis.getVoices();
+            const femaleVoice = voices.find(voice => 
+                voice.name.includes('Female') || 
+                voice.name.includes('Samantha') || 
+                voice.name.includes('Google UK English Female')
+            );
+            
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+            
+            utterance.onstart = () => {
+                isSpeaking = true;
+                speakBtn.classList.add('active');
+                stopBtn.disabled = false;
+            };
+            
+            utterance.onend = () => {
+                isSpeaking = false;
+                speakBtn.classList.remove('active');
+                stopBtn.disabled = true;
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event);
+                isSpeaking = false;
+                speakBtn.classList.remove('active');
+                stopBtn.disabled = true;
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+        
+        // Speak button event
+        speakBtn.addEventListener('click', () => {
+            const content = adviceContent.innerText;
+            if (content.trim() !== '') {
+                speakText(content);
+            }
+        });
+        
+        // Stop button event
+        stopBtn.addEventListener('click', () => {
+            speechSynthesis.cancel();
+            isSpeaking = false;
+            speakBtn.classList.remove('active');
+            stopBtn.disabled = true;
+        });
+        
+        // Render game state
+        function render() {
+            // Update stats
+            yearEl.textContent = gameState.year;
+            budgetEl.textContent = `$${(gameState.budget / 1000).toFixed(1)}B`;
+            approvalEl.textContent = `${gameState.approval}%`;
+            threatsEl.textContent = gameState.threats.length;
+            
+            // Render threats
+            threatListEl.innerHTML = '';
+            if (gameState.threats.length === 0) {
+                threatListEl.innerHTML = '<div class="threat-item"><div class="threat-header">No active threats</div></div>';
+            } else {
+                gameState.threats.forEach(threat => {
+                    const riskClass = threat.risk >= 3 ? 'high' : threat.risk >= 2 ? 'medium' : 'low';
+                    const threatEl = document.createElement('div');
+                    threatEl.className = `threat-item ${riskClass}`;
+                    threatEl.innerHTML = `
+                        <div class="threat-header">
+                            <span>${threat.name}</span>
+                            <span>Risk: ${threat.risk}/4</span>
+                        </div>
+                        <div class="threat-details">
+                            Size: ${threat.size} | Composition: ${threat.composition}<br>
+                            Trajectory: ${threat.trajectory}<br>
+                            Impact in: ${threat.yearsUntilImpact} years
+                        </div>
+                    `;
+                    threatListEl.appendChild(threatEl);
+                });
+            }
+            
+            // Render news
+            newsFeedEl.innerHTML = '';
+            gameState.news.forEach(news => {
+                const newsEl = document.createElement('div');
+                newsEl.className = 'news-item';
+                newsEl.textContent = news;
+                newsFeedEl.appendChild(newsEl);
+            });
+            
+            // Render technologies
+            const techGrid = document.getElementById('techGrid');
+            techGrid.innerHTML = '';
+            
+            Object.entries(gameState.technologies).forEach(([key, tech]) => {
+                const techEl = document.createElement('div');
+                techEl.className = `tech-card ${tech.researched ? '' : 'locked'}`;
+                techEl.innerHTML = `
+                    <div><strong>${tech.name}</strong></div>
+                    <div class="tech-status">${tech.description}</div>
+                    ${tech.researched ? '<div class="tech-status">RESEARCHED</div>' : `<div class="tech-cost">Cost: $${(tech.cost/1000).toFixed(1)}B</div>`}
+                `;
+                techGrid.appendChild(techEl);
+            });
+            
+            // Update budget allocation display
+            updateBudgetAllocation();
+        }
+        
+        // Show game over screen
+        function showGameOver() {
+            if (gameState.victory) {
+                gameOverTitleEl.textContent = "MISSION ACCOMPLISHED!";
+                gameOverTitleEl.style.color = "#4caf50";
+                gameOverMessageEl.textContent = "You successfully protected Earth from all asteroid threats for 20 years! Humanity's future is secure thanks to your leadership.";
+            } else {
+                gameOverTitleEl.textContent = "GAME OVER";
+                gameOverTitleEl.style.color = "#ff5252";
+                gameOverMessageEl.textContent = "Earth has been destroyed by an asteroid impact. Humanity's legacy ends here.";
+            }
+            gameOverEl.classList.add('show');
+        }
+        
+        // Restart game
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            // Reset game state
+            gameState.year = 2025;
+            gameState.budget = 12500;
+            gameState.approval = 78;
+            gameState.threats = [];
+            gameState.news = ["Welcome to the Global Asteroid Defense Initiative! Your mission begins now."];
+            gameState.gameOver = false;
+            gameState.victory = false;
+            
+            // Reset technologies
+            Object.keys(gameState.technologies).forEach(key => {
+                if (key !== 'detection1') {
+                    gameState.technologies[key].researched = false;
+                }
+            });
+            
+            // Reset sliders
+            sliders.detect.value = 30;
+            sliders.deflect.value = 40;
+            sliders.civil.value = 15;
+            sliders.diplo.value = 10;
+            sliders.outreach.value = 5;
+            
+            // Hide game over screen
+            gameOverEl.classList.remove('show');
+            
+            // Render initial state
+            render();
+        });
+        
+        // Create asteroid animations
+        function createAsteroidAnimation() {
+            const container = document.getElementById('asteroidAnimation');
+            container.innerHTML = '';
+            
+            // Create 5-10 asteroids
+            const count = Math.floor(Math.random() * 6) + 5;
+            
+            for (let i = 0; i < count; i++) {
+                const asteroid = document.createElement('div');
+                asteroid.className = 'asteroid';
+                
+                // Random size
+                const size = Math.random() * 30 + 10;
+                asteroid.style.width = `${size}px`;
+                asteroid.style.height = `${size}px`;
+                
+                // Random position
+                asteroid.style.left = `${Math.random() * 100}%`;
+                asteroid.style.top = `${-size}px`;
+                
+                // Random speed
+                const duration = Math.random() * 20 + 10;
+                asteroid.style.animation = `fall ${duration}s linear infinite`;
+                asteroid.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(asteroid);
+            }
+            
+            // Add CSS for animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall {
+                    0% { transform: translateY(0) rotate(0deg); }
+                    100% { transform: translateY(${window.innerHeight + 100}px) rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Initialize game
+        window.addEventListener('load', () => {
+            createAsteroidAnimation();
+            render();
+            
+            // Initialize speech synthesis voices when available
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    // Voices are now loaded
+                };
+            }
+        });
+    </script>
+</body>
+</html>
